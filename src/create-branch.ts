@@ -1,9 +1,14 @@
-import { Context } from '@actions/github/lib/context';
+import { Context } from "@actions/github/lib/context";
 
-export async function createBranch(getOctokit: any, context: Context, branch: string, sha?: string) {
+export async function createBranch(
+  getOctokit: any,
+  context: Context,
+  branch: string,
+  sha?: string
+) {
   const toolkit = getOctokit(githubToken());
   // Sometimes branch might come in with refs/heads already
-  branch = branch.replace('refs/heads/', '');
+  branch = branch.replace("refs/heads/", "");
   const ref = `refs/heads/${branch}`;
 
   // throws HttpError if branch already exists.
@@ -13,7 +18,7 @@ export async function createBranch(getOctokit: any, context: Context, branch: st
       branch,
     });
   } catch (error: any) {
-    if (error.name === 'HttpError' && error.status === 404) {
+    if (error.name === "HttpError" && error.status === 404) {
       const resp = await toolkit.rest.git.createRef({
         ref,
         sha: sha || context.sha,
@@ -29,6 +34,7 @@ export async function createBranch(getOctokit: any, context: Context, branch: st
 
 function githubToken(): string {
   const token = process.env.GITHUB_TOKEN;
-  if (!token) throw ReferenceError('No token defined in the environment variables');
+  if (!token)
+    throw ReferenceError("No token defined in the environment variables");
   return token;
 }
